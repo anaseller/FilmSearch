@@ -25,8 +25,8 @@ def main():
             genre_choice = input('Введите номер жанра (или 0 для пропуска): ')
             genre = genres[int(genre_choice) - 1] if genre_choice.isdigit() and int(genre_choice) > 0 and int(genre_choice) <= len(genres) else None
 
-            keyword = input('Ключевое слово (Enter чтобы пропустить): ')
-            year = input('Год (Enter чтобы пропустить): ')
+            keyword = input('Введите ключевое слово (Enter чтобы пропустить): ')
+            year = input('Введите год (Enter чтобы пропустить): ')
             year = int(year) if year else None
 
             results = searcher.combined_search(keyword or None, genre, year)
