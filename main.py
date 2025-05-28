@@ -49,9 +49,9 @@ def main():
                     print(f'{title} ({release_year}) - {category}\n{description}\n')
 
                 if pages == 1:
-                    break  # если всего одна страница, нет пагинации
+                    break
 
-                print('1 — следующая страница, 2 — предыдущая страница, 0 — выход')
+                print('1 — следующая страница, 2 — предыдущая страница, 0 — выход в главное меню')
                 print(f'\n--- Результаты (страница {current_page}/{pages}) ---')
                 nav = input('> ').strip().lower()
                 if nav == '1' and current_page < pages:
