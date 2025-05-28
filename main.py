@@ -51,13 +51,11 @@ def main():
                 if pages == 1:
                     break
 
-                print('1 — следующая страница, 2 — предыдущая страница, 0 — выход в главное меню')
+                print('1 — следующая страница, 0 — выход в главное меню')
                 print(f'\n--- Результаты (страница {current_page}/{pages}) ---')
                 nav = input('> ').strip().lower()
                 if nav == '1' and current_page < pages:
                     current_page += 1
-                elif nav == '2' and current_page > 1:
-                    current_page -= 1
                 elif nav == '0':
                     break
                 else:
