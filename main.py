@@ -2,7 +2,6 @@
 
 from search_module import SearchModule
 from top_queries import TopQueries
-import math
 
 def main():
     searcher = SearchModule()
@@ -24,8 +23,19 @@ def main():
             print('\nВыберите жанр из списка или нажмите 0, чтобы пропустить выбор жанра:')
             for idx, genre_name in enumerate(genres, 1):
                 print(f'{idx}. {genre_name}')
-            genre_choice = input('\033[96m' + 'Введите номер жанра (или 0 для пропуска): ' + '\033[0m').strip()
-            genre = genres[int(genre_choice) - 1] if genre_choice.isdigit() and int(genre_choice) > 0 and int(genre_choice) <= len(genres) else None
+
+            while True:
+                genre_choice = input('\033[96m' + 'Введите номер жанра (или 0 для пропуска): ' + '\033[0m').strip()
+                if genre_choice.isdigit():
+                    genre_num = int(genre_choice)
+                    if 0 <= genre_num <= len(genres):
+                        break
+                print('\033[31m' + 'Неверный ввод. Повторите попытку.' + '\033[0m')
+
+            genre = genres[genre_num - 1] if genre_num != 0 else None
+
+            # genre_choice = input('\033[96m' + 'Введите номер жанра (или 0 для пропуска): ' + '\033[0m').strip()
+            # genre = genres[int(genre_choice) - 1] if genre_choice.isdigit() and int(genre_choice) > 0 and int(genre_choice) <= len(genres) else None
 
             keyword = input('\033[96m' + 'Введите ключевое слово (или Enter чтобы пропустить): ' + '\033[0m').strip()
             year = input('\033[96m' + 'Введите год (или Enter чтобы пропустить): ' + '\033[0m').strip()
@@ -40,7 +50,7 @@ def main():
                 continue
 
             results_per_page = 15
-            pages = math.ceil(total / results_per_page)
+            pages = (total + results_per_page - 1) // results_per_page
             current_page = 1
 
             while True:

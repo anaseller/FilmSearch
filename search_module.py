@@ -1,47 +1,77 @@
 
-
 import mysql.connector
 import local_settings
 
 class SearchModule:
     def __init__(self):
-        self.conn = mysql.connector.connect(
-            host=local_settings.DB_HOST,
-            user=local_settings.DB_USER,
-            password=local_settings.DB_PASSWORD,
-            database=local_settings.DB_DATABASE
-        )
-        self.cursor = self.conn.cursor()
+        try:
+            self.conn = mysql.connector.connect(
+                host=local_settings.DB_HOST,
+                user=local_settings.DB_USER,
+                password=local_settings.DB_PASSWORD,
+                database=local_settings.DB_DATABASE
+            )
+            self.cursor = self.conn.cursor()
+        except mysql.connector.Error as err:
+            print('\033[31m' + f'Ошибка подключения к базе данных: {err}' + '\033[0m')
+            self.conn = None
+            self.cursor = None
 
     def combined_search(self, keyword=None, genre=None, year=None):
-        query = '''
+        if not self.cursor:
+            print('\033[31m' + 'Нет соединения с базой данных.' + '\033[0m')
+            return []
+
+        base_query = '''
             SELECT DISTINCT f.title, f.release_year, f.description, c.name AS category
             FROM film f
             JOIN film_category fc ON f.film_id = fc.film_id
             JOIN category c ON fc.category_id = c.category_id
-            WHERE 1=1
         '''
+        conditions = []
         params = []
 
         if keyword:
-            query += ' AND f.title LIKE %s'
+            conditions.append('f.title LIKE %s')
             params.append(f'%{keyword}%')
         if genre:
-            query += ' AND c.name = %s'
+            conditions.append('c.name = %s')
             params.append(genre)
         if year:
-            query += ' AND f.release_year = %s'
+            conditions.append('f.release_year = %s')
             params.append(year)
 
-        query += ' ORDER BY f.title'
-        self.cursor.execute(query, params)
-        return self.cursor.fetchall()
+        if conditions:
+            base_query += ' WHERE ' + ' AND '.join(conditions)
+
+        base_query += ' ORDER BY f.title'
+
+        try:
+            self.cursor.execute(base_query, params)
+            results = self.cursor.fetchall()
+            return results if results else []
+        except mysql.connector.Error as err:
+            print('\033[31m' + f'Ошибка при выполнении запроса: {err}' + '\033[0m')
+            return []
 
     def get_genres(self):
-        self.cursor.execute('SELECT name FROM category ORDER BY name')
-        return [row[0] for row in self.cursor.fetchall()]
+        if not self.cursor:
+            print('\033[31m' + 'Нет соединения с базой данных.' + '\033[0m')
+            return []
+
+        try:
+            self.cursor.execute('SELECT name FROM category ORDER BY name')
+            results = self.cursor.fetchall()
+            return [row[0] for row in results] if results else []
+        except mysql.connector.Error as err:
+            print('\033[31m' + f'Ошибка при получении жанров: {err}' + '\033[0m')
+            return []
 
     def close(self):
-        self.cursor.close()
-        self.conn.close()
+        if self.cursor:
+            self.cursor.close()
+        if self.conn:
+            self.conn.close()
+
+
 
