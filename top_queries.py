@@ -1,4 +1,5 @@
-
+# In diesem Modul speichern wir die Suchanfragen in der Datenbank.
+# Beim Aufruf des entsprechenden Befehls sieht der Benutzer die 10 beliebtesten Suchanfragen.
 
 import mysql.connector
 import local_settings
@@ -15,7 +16,7 @@ class TopQueries:
             )
             self.cursor = self.conn.cursor(dictionary=True)
         except mysql.connector.Error as err:
-            print('\033[31m' + f'Ошибка подключения к базе данных: {err}' + '\033[0m')
+            print('\033[31m' + f'Database connection error: {err}' + '\033[0m')
             self.conn = None
             self.cursor = None
 
@@ -31,7 +32,7 @@ class TopQueries:
             self.cursor.execute(query, (keyword, genre, year, now))
             self.conn.commit()
         except mysql.connector.Error as err:
-            print('\033[31m' + f'Ошибка при сохранении запроса: {err}' + '\033[0m')
+            print('\033[31m' + f'Error saving the query: {err}' + '\033[0m')
 
     def get_top_queries(self, limit=10):
         if not self.cursor:
@@ -47,7 +48,7 @@ class TopQueries:
             self.cursor.execute(query, (limit,))
             return self.cursor.fetchall()
         except mysql.connector.Error as err:
-            print('\033[31m' + f'Ошибка при получении топ-запросов: {err}' + '\033[0m')
+            print('\033[31m' + f'Error retrieving top queries: {err}' + '\033[0m')
             return []
 
     def format_query(self, row):
@@ -58,13 +59,13 @@ class TopQueries:
             parts.append(str(row['genre']))
         if row.get('year'):
             parts.append(str(row['year']))
-        return ' '.join(parts) if parts else '(пустой запрос)'
+        return ' '.join(parts) if parts else '(empty query)'
 
     def print_top_queries(self):
         top = self.get_top_queries()
         for row in top:
             query_str = self.format_query(row)
-            print(f'{query_str} — {row["count"]} раз')
+            print(f'{query_str} — {row["count"]} times')
 
     def close(self):
         if self.cursor:

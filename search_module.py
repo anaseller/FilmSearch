@@ -1,3 +1,6 @@
+# Das ist das Suchmodul.
+# Die Suchanfrage wird dynamisch basierend auf den vom Benutzer eingegebenen Parametern erstellt.
+# Die Suche kann nach einem oder mehreren Parametern erfolgen.
 
 import mysql.connector
 import local_settings
@@ -13,13 +16,13 @@ class SearchModule:
             )
             self.cursor = self.conn.cursor()
         except mysql.connector.Error as err:
-            print('\033[31m' + f'Ошибка подключения к базе данных: {err}' + '\033[0m')
+            print('\033[31m' + f'Database connection error: {err}' + '\033[0m')
             self.conn = None
             self.cursor = None
 
     def combined_search(self, keyword=None, genre=None, year=None):
         if not self.cursor:
-            print('\033[31m' + 'Нет соединения с базой данных.' + '\033[0m')
+            print('\033[31m' + 'No connection to the database.' + '\033[0m')
             return []
 
         base_query = '''
@@ -51,12 +54,12 @@ class SearchModule:
             results = self.cursor.fetchall()
             return results if results else []
         except mysql.connector.Error as err:
-            print('\033[31m' + f'Ошибка при выполнении запроса: {err}' + '\033[0m')
+            print('\033[31m' + f'Error executing the query: {err}' + '\033[0m')
             return []
 
     def get_genres(self):
         if not self.cursor:
-            print('\033[31m' + 'Нет соединения с базой данных.' + '\033[0m')
+            print('\033[31m' + 'No connection to the database.' + '\033[0m')
             return []
 
         try:
@@ -64,7 +67,7 @@ class SearchModule:
             results = self.cursor.fetchall()
             return [row[0] for row in results] if results else []
         except mysql.connector.Error as err:
-            print('\033[31m' + f'Ошибка при получении жанров: {err}' + '\033[0m')
+            print('\033[31m' + f'Error retrieving genres: {err}' + '\033[0m')
             return []
 
     def close(self):
